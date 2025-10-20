@@ -11,4 +11,4 @@ humantime = "2.3"
 chrono = { version = "0.4", default-features = false, features = ["clock"] }
 k8s-openapi = { version = "0.26", features = ["v1_30"] }
 
-# rustls = { version = "0.23", default-features = false, features = ["aws-lc-rs"] }
+rustls = { version = "0.23", default-features = false, features = ["aws-lc-rs"] }

@@ -4,6 +4,7 @@ FROM rust:1.90-slim AS builder
 WORKDIR /app
 
 # Add the musl target for static linking
+RUN apt-get update && apt-get install -y musl-tools build-essential pkg-config && rm -rf /var/lib/apt/lists/*
 RUN rustup target add x86_64-unknown-linux-musl
 
 # Copy manifest and lock so dependencies can be cached
