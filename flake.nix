@@ -93,7 +93,7 @@
 
             # Rust format/lints
             rustfmt.enable = true;
-            clippy.enable = true;
+            # clippy.enable = true;
 
             # Optional: run a fast build check (uncomment if desired)
             # cargo-check.enable = true;
@@ -110,7 +110,7 @@
             echo 1>&2 "Welcome to the development shell (Rust ${rustVersion})!"
             echo 1>&2 "  - rustc:   $(${pkgs.coreutils}/bin/printf '%s' "$(${rustc}/bin/rustc --version)")"
             echo 1>&2 "  - cargo:   $(${pkgs.coreutils}/bin/printf '%s' "$(${cargo}/bin/cargo --version)")"
-            echo 1>&2 "  - clippy:  $(${pkgs.coreutils}/bin/printf '%s' "$(${clippy}/bin/cargo-clippy --version 2>/dev/null || echo 'available via cargo clippy')")"
+            # echo 1>&2 "  - clippy:  $(${pkgs.coreutils}/bin/printf '%s' "$(${clippy}/bin/cargo-clippy --version 2>/dev/null || echo 'available via cargo clippy')")"
             echo 1>&2 "  - rustfmt: $(${pkgs.coreutils}/bin/printf '%s' "$(${rustfmt}/bin/rustfmt --version)")"
           '';
 
