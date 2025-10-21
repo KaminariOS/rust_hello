@@ -1,32 +1,37 @@
-
 # --- Build stage ---
 FROM rust:1.90-slim AS builder
 WORKDIR /app
 
-# Add the musl target for static linking
-RUN apt-get update && apt-get install -y musl-tools build-essential pkg-config && rm -rf /var/lib/apt/lists/*
+# Install build essentials, musl, and cargo-chef
+RUN apt-get update && apt-get install -y musl-tools build-essential pkg-config && \
+    rm -rf /var/lib/apt/lists/*
 RUN rustup target add x86_64-unknown-linux-musl
+# Install cargo-chef
+RUN cargo install cargo-chef
 
-# Copy manifest and lock so dependencies can be cached
+# --- Dependency caching stage ---
+# Copy manifests to compute dependency plan
 COPY Cargo.toml Cargo.lock ./
+# This creates a 'recipe' of just your dependencies
+RUN cargo chef prepare --recipe-path recipe.json
 
-# Create a dummy source file to ensure dependencies build ahead of time
-# RUN mkdir src && echo "fn main() { println!(\"dummy1\"); }" > src/main.rs
-# RUN cargo build --release --target x86_64-unknown-linux-musl
-# RUN rm -rf src
+# Build (cook) dependencies. This layer is cached.
+RUN cargo chef cook --release --target x86_64-unknown-linux-musl --recipe-path recipe.json
 
-# Now copy actual source code
+# --- Application build stage ---
+# Copy actual source code
 COPY src ./src
-# If you have other folders (e.g., migrations, templates), copy them here as well
 # COPY migrations ./migrations
-
-# Build the real binary (replace `myserver` with your binary name)
-RUN cargo build --release --target x86_64-unknown-linux-musl --bin rust_hello 
+ENV RUSTFLAGS="-C target-feature=+crt-static"
+# Build the real binary, leveraging cached dependencies
+RUN cargo build --release --target x86_64-unknown-linux-musl --bin rust_hello --locked
 
 # --- Runtime stage ---
-FROM scratch
-# If your binary uses TLS / OpenSSL / HTTPS you may need certificates:
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+# Use distroless/static as a more secure alternative to scratch
+# It's tiny but includes basics like a non-root user and timezone data
+FROM gcr.io/distroless/static-debian12
+# Alpine needs these to run musl binaries
+# RUN apk add --no-cache musl-dev libc-utils
 
 # Copy the statically-linked binary
 COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/rust_hello /rust_hello
@@ -34,4 +39,6 @@ COPY --from=builder /app/target/x86_64-unknown-linux-musl/release/rust_hello /ru
 # Expose port (adjust as needed)
 EXPOSE 3000
 
+# 'distroless/static' images run as 'nonroot' (UID 65532) by default,
+# so the 'USER' command is not needed.
 ENTRYPOINT ["/rust_hello"]
