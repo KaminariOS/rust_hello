@@ -1,0 +1,3 @@
+{{- if .Values.autoscaling.enabled -}}
+{{- fail "HorizontalPodAutoscaler is not supported when running rust-hello as a DaemonSet. Disable autoscaling or change the workload type." -}}
+{{- end }}

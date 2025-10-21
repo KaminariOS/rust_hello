@@ -1,0 +1,6 @@
+apiVersion: v2
+name: rust-hello
+description: A Helm chart for the rust-hello Axum service.
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

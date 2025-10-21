@@ -1,0 +1,38 @@
+{{- if .Values.serviceAccount.create }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "rust-hello.serviceAccountName" . }}
+  labels:
+    {{- include "rust-hello.labels" . | nindent 4 }}
+{{- end }}
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "rust-hello.fullname" . }}-role
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "rust-hello.labels" . | nindent 4 }}
+rules:
+- apiGroups: [""]
+  resources: ["services" , "endpoints"]
+  verbs: ["get", "list", "watch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "rust-hello.fullname" . }}-rolebinding
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "rust-hello.labels" . | nindent 4 }}
+subjects:
+- kind: ServiceAccount
+  name: {{ include "rust-hello.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: Role
+  name: {{ include "rust-hello.fullname" . }}-role
+  apiGroup: rbac.authorization.k8s.io
