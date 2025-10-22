@@ -66,9 +66,9 @@ async fn service_uptime(State(state): State<AppState>) -> Html<String> {
         <title>K8s Service Uptime</title>
     </head>
     <body style="font-family: sans-serif; font-size: 32px; margin: 2rem;">
-        <div>Hello, this is Kosumi' self hosted website, under construction. </div>
+        <div>Hello, this is Kosumi's self hosted homepage, under construction. </div>
         <div> Service <strong>{}</strong> has been up for {}</div>
-        <div style="margin-top: 0.5rem;">Replicas online: <strong>{}</strong></div>
+        <div style="margin-top: 0.5rem;">Replicas online: <strong>{}</strong>(Need one more node for High Availability)</div>
         <div style="margin-top: 1rem; font-size: 18px;">
             Created at {} in namespace <code>{}</code>
         </div>
