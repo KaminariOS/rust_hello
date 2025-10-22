@@ -1,6 +1,13 @@
 use std::{fs, time::Duration};
 
-use axum::{Router, extract::State, response::Html, routing::get};
+use axum::response::IntoResponse;
+use axum::{
+    Router,
+    body::Bytes,
+    extract::State,
+    response::Html,
+    routing::{get, post},
+};
 use chrono::Utc;
 use humantime::format_duration;
 use k8s_openapi::api::core::v1::{Endpoints, Service};
@@ -112,6 +119,10 @@ async fn service_uptime(State(state): State<AppState>) -> Html<String> {
     }
 }
 
+async fn echo(body: Bytes) -> impl IntoResponse {
+    body
+}
+
 fn render_error(message: String) -> String {
     format!(
         r#"<!DOCTYPE html>
@@ -160,6 +171,7 @@ async fn main() {
 
     let app = Router::new()
         .route("/", get(service_uptime))
+        .route("/echo", get(echo).post(echo))
         .with_state(app_state);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
