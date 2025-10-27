@@ -56,6 +56,21 @@ Symbols: 1MB.
 
 The final stage is based on `gcr.io/distroless/static-debian12`, runs as a non-root user, and exposes port `3000`.
 
+### Dockerfile Highlights
+- Multi-architecture friendly: the build args `TARGETARCH` and `TARGETPLATFORM` plug into BuildKit/`buildx`, so you can produce `linux/amd64` and `linux/arm64` images from a single definition without edits.
+- Deterministic dependency caching: `cargo chef prepare` and `cargo chef cook` warm the dependency layer before the app sources are copied, which keeps rebuilds fast.
+- Fully static binaries: the builder stage uses `allheil/rust-musl-cross` so the resulting binary links against `musl` and can run in the distroless static image.
+- Distroless runtime: the final stage inherits a non-root user and the minimal Debian 12 base, yielding a tiny, scratch-like image with timezone data included.
+
+### Multi-Architecture Build Example
+```bash
+podman buildx build \
+  --platform linux/amd64,linux/arm64 \
+  -t rust-hello:multi \
+  .
+```
+<!-- Add `--push` to publish to a registry once you have tested the manifest locally. -->
+
 ## Kubernetes Deployment
 - Helm chart: `charts/rust-hello`
 - Helper script: `deploy.sh` (builds with Podman, pushes to a registry, and upgrades the Helm release)
@@ -91,4 +106,3 @@ The shell prints toolchain versions on entry and ensures `rustfmt`, `clippy`, an
 
 ## Status & Next Steps
 The service currently focuses on uptime reporting. Enhancements on the roadmap (see `TODO.md`) include reducing image size and improving replica handling.
-

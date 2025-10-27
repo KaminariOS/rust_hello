@@ -11,17 +11,35 @@ NAMESPACE="default"                 # Kubernetes namespace
 # --- STEP 1: Generate tag based on timestamp ---
 TAG=$(date +"%Y%m%d%H%M%S")
 FULL_IMAGE="${REGISTRY}/${IMAGE_NAME}:${TAG}"
+# Default to multi-arch build (override with PLATFORMS or legacy PLATFORM env vars)
+PLATFORMS="${PLATFORMS:-${PLATFORM:-linux/amd64,linux/arm64}}"
 
 echo "🕒 Generated tag: ${TAG}"
 echo "📦 Full image: ${FULL_IMAGE}"
+echo "🧭 Target platform(s): ${PLATFORMS}"
 
-# --- STEP 2: Build Docker image ---
-echo "🐳 Building Docker image..."
-podman build -t "${FULL_IMAGE}" .
+# --- STEP 2: Build & publish image(s) with podman buildx ---
+echo "🐳 Building image(s) via podman buildx..."
+if [[ "${PLATFORMS}" == *","* ]]; then
+  podman -r buildx build \
+    --platform "${PLATFORMS}" \
+    --manifest "${FULL_IMAGE}" \
+    --file Dockerfile \
+    .
 
-# --- STEP 3: Push Docker image ---
-echo "🚀 Pushing Docker image..."
-podman push "${FULL_IMAGE}"
+  echo "📤 Pushing multi-arch manifest..."
+  podman -r manifest push --all "${FULL_IMAGE}" 
+  # "docker://${FULL_IMAGE}"
+else
+  podman -r buildx build \
+    --platform "${PLATFORMS}" \
+    --tag "${FULL_IMAGE}" \
+    --file Dockerfile \
+    .
+
+  echo "📤 Pushing image..."
+  podman -r push "${FULL_IMAGE}"
+fi
 
 # --- STEP 4: Upgrade Helm release with new image tag ---
 echo "🔧 Upgrading Helm release..."
