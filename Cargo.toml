@@ -25,3 +25,6 @@ panic = "abort"         # no unwinding, smaller & faster
 strip = "symbols"       # strip symbols from binary
 incremental = false     # cleaner optimized code
 debug = false           # don’t keep debug info
+
+[target.'cfg(target_env = "musl")'.dependencies]
+mimalloc = "0.1.43"

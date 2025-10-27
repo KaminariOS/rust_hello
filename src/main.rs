@@ -13,6 +13,10 @@ use humantime::format_duration;
 use k8s_openapi::api::core::v1::{Endpoints, Service};
 use kube::{Client, Error as KubeError, api::Api};
 
+#[cfg(target_env = "musl")]
+#[global_allocator]
+static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
+
 #[derive(Clone)]
 struct AppState {
     client: Option<Client>,
