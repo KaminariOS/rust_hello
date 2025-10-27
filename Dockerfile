@@ -14,9 +14,9 @@ RUN env -u CARGO_BUILD_TARGET cargo install --locked cargo-chef
 # Copy manifests to compute dependency plan
 COPY Cargo.toml Cargo.lock ./
 # This creates a 'recipe' of just your dependencies
-# RUN cargo chef prepare --recipe-path recipe.json
+RUN cargo chef prepare --recipe-path recipe.json
 #
-# RUN cargo chef cook --release --recipe-path recipe.json
+RUN cargo chef cook --release --recipe-path recipe.json
 
 # --- Application build stage ---
 # Copy actual source code

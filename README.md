@@ -64,10 +64,13 @@ The final stage is based on `gcr.io/distroless/static-debian12`, runs as a non-r
 
 ### Multi-Architecture Build Example
 ```bash
-podman buildx build \
-  --platform linux/amd64,linux/arm64 \
-  -t rust-hello:multi \
-  .
+podman -r buildx build \
+--platform linux/amd64,linux/arm64 \
+--manifest rust-hello:multi \
+--file Dockerfile \
+.
+
+podman -r manifest push --all rust-hello:multi 
 ```
 <!-- Add `--push` to publish to a registry once you have tested the manifest locally. -->
 
