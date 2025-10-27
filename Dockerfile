@@ -2,7 +2,7 @@ ARG TARGETARCH=amd64
 # --- Build stage ---
 # A re-taggeed version of ghcr.io/rust-cross/rust-musl-cross
 # See https://github.com/rust-cross/rust-musl-cross/issues/133#issuecomment-3449162968
-FROM --platform=$BUILDPLATFORM docker.io/allheil/rust-musl-cross:$TARGETARCH AS builder
+FROM --platform=$BUILDPLATFORM docker.io/allheil/rust-musl-cross:$TARGETARCH AS builder-base
 WORKDIR /app
 
 # Install cargo-chef
@@ -10,12 +10,15 @@ WORKDIR /app
 # --locked to make this layer deterministic 
 RUN env -u CARGO_BUILD_TARGET cargo install --locked cargo-chef
 
+FROM builder-base AS builder-prepare
 # --- Dependency caching stage ---
 # Copy manifests to compute dependency plan
 COPY Cargo.toml Cargo.lock ./
 # This creates a 'recipe' of just your dependencies
 RUN cargo chef prepare --recipe-path recipe.json
-#
+
+FROM builder-base AS builder
+COPY --from=builder-prepare /app/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
 
 # --- Application build stage ---
