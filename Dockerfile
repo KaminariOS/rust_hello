@@ -13,17 +13,17 @@ RUN env -u CARGO_BUILD_TARGET cargo install --locked cargo-chef
 FROM builder-base AS builder-prepare
 # --- Dependency caching stage ---
 # Copy manifests to compute dependency plan
-COPY Cargo.toml Cargo.lock ./
+COPY . .
 # This creates a 'recipe' of just your dependencies
 RUN cargo chef prepare --recipe-path recipe.json
 
 FROM builder-base AS builder
 COPY --from=builder-prepare /app/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
-
 # --- Application build stage ---
 # Copy actual source code
-COPY src ./src
+COPY . .
+
 
 RUN cargo build --release --bin rust_hello  
 
@@ -31,7 +31,7 @@ RUN cargo build --release --bin rust_hello
 # Use distroless/static as a more secure alternative to scratch
 # It's tiny but includes basics like a non-root user and timezone data
 FROM  --platform=$TARGETPLATFORM gcr.io/distroless/static-debian12
-COPY --from=builder /app/target/*/release/rust_hello /rust_hello
+COPY --from=builder /app/target/*/release/rust_hello /
 
 # Expose port (adjust as needed)
 EXPOSE 3000
