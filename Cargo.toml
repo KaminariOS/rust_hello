@@ -26,5 +26,6 @@ strip = "symbols"       # strip symbols from binary
 incremental = false     # cleaner optimized code
 debug = false           # don’t keep debug info
 
+# https://nickb.dev/blog/default-musl-allocator-considered-harmful-to-performance
 [target.'cfg(target_env = "musl")'.dependencies]
 mimalloc = "0.1.43"

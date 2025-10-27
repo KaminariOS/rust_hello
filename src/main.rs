@@ -13,6 +13,7 @@ use humantime::format_duration;
 use k8s_openapi::api::core::v1::{Endpoints, Service};
 use kube::{Client, Error as KubeError, api::Api};
 
+// https://nickb.dev/blog/default-musl-allocator-considered-harmful-to-performance
 #[cfg(target_env = "musl")]
 #[global_allocator]
 static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
