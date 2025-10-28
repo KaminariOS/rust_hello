@@ -1,6 +1,6 @@
 ARG TARGETARCH=amd64
 # --- Build stage ---
-# A re-taggeed version of ghcr.io/rust-cross/rust-musl-cross
+# A re-tagged version of ghcr.io/rust-cross/rust-musl-cross
 # See https://github.com/rust-cross/rust-musl-cross/issues/133#issuecomment-3449162968
 FROM --platform=$BUILDPLATFORM docker.io/allheil/rust-musl-cross:$TARGETARCH AS builder-base
 WORKDIR /app
