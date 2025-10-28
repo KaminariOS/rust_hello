@@ -15,8 +15,8 @@ However, `kube-rs` needs TLS to talk to K8S. Therefore, use rust-tls.
 Instead of the `scatch` base image, use `distroless`: just like scratch, but run as non-root and timezone data is included.
 
 ## Features
-- Minimal image size: 10.4 MB 
-- Minimal runtime memory footprint: 1 MB
+- Minimal image size: 10.4 MB(a Go Gin helloworld web server is 20.1 MB) 
+- Minimal runtime memory footprint: 1 MB(after using mimalloc: 20MB)
 - Computes uptime for a named Kubernetes Service by reading its `creationTimestamp`.
 - Counts ready endpoints via the Kubernetes Endpoints API to highlight replica availability.
 - Renders a minimal HTML page suitable for dashboards or homepages.
