@@ -3,7 +3,7 @@ set -euo pipefail
 
 # --- CONFIGURATION ---
 IMAGE_NAME="rust-hello"                  # Change this to your image name
-REGISTRY="docker.io/allheil"         # Change to your registry (e.g., Docker Hub, GHCR, ECR)
+REGISTRY="ghcr.io/kaminarios"         # Change to your registry (e.g., Docker Hub, GHCR, ECR)
 CHART_PATH="./charts/$IMAGE_NAME"           # Path to Helm chart
 RELEASE_NAME=$IMAGE_NAME                # Helm release name
 NAMESPACE="default"                 # Kubernetes namespace
@@ -33,12 +33,12 @@ if [[ "${PLATFORMS}" == *","* ]]; then
 else
   podman -r buildx build \
     --platform "${PLATFORMS}" \
-    --tag "${FULL_IMAGE}" \
+    --manifest "${FULL_IMAGE}" \
     --file Dockerfile \
     .
 
   echo "📤 Pushing image..."
-  podman -r push "${FULL_IMAGE}"
+  podman -r manifest push --all "${FULL_IMAGE}"
 fi
 
 # --- STEP 4: Upgrade Helm release with new image tag ---
