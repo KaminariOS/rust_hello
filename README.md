@@ -3,7 +3,9 @@
 `rust_hello` is a lightweight Axum-based web service that reports how long a Kubernetes Service has been running and how many pod endpoints are currently available. It is designed for quick status pages, such as self-hosted homepages, and degrades gracefully when it cannot talk to a cluster.
 
 ## Motivation
-Just want to push the limit of a practical Rust container and see how small it can get. 
+I want to push the limits of a practical Rust container and see how small it can be. 
+
+Also, non-x86 computing platforms(Arm and RiscV) are emerging, so multi-arch support is essential for the deployment of Rust applications in hybrid clusters.
 
 ## Considerations
 To build a minimal image, static linking is necessary.
